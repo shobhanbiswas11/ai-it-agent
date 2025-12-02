@@ -12,12 +12,13 @@ describe("Zabbix Test", () => {
   });
 
   test("connection", async () => {
-    const res = await zabbixLogSource.checkConnection();
+    const res = await zabbixLogSource.testConnection();
     expect(res.success).toBe(true);
   });
 
   test("fetch logs", async () => {
     const res = await zabbixLogSource.fetchLogs();
+    console.log(res);
     expect(res.count).toBeGreaterThan(0);
   });
 });
