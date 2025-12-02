@@ -1,4 +1,4 @@
-interface FetchLogFilter {}
+export interface FetchLogFilter {}
 
 export interface ILogFetcher {
   fetchLogs(filter?: FetchLogFilter): Promise<{

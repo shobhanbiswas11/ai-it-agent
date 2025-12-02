@@ -11,9 +11,4 @@ This will be an AI Powered IT Operation handler with feature like Log Monitoring
 
 ## Use-cases
 - CheckLogSourceConnection
-- CollectAndStoreRawLogs
-- CollectLogs
-- DetectAnomalousLogs
-- CollectTickets
-- MakeTicketsSearchable
-- PerformTask
+- TestLogAnomalyDetection

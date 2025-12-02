@@ -9,5 +9,6 @@ module.exports = {
   transform: {
     ...tsJestTransformCfg,
   },
-  testPathIgnorePatterns: [".*\\.integration\\.test\\.ts$"],
+  testMatch: ["**/__tests__/**/*.integration.test.ts"],
+  testTimeout: 30000,
 };
