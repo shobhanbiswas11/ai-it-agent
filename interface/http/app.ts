@@ -8,15 +8,14 @@ app.use(express.json());
 
 const logAnalysisController = new LogAnalysisController();
 
-app.post("/test-log-source-connection", async (req, res, next) => {
-  try {
-    const result = await logAnalysisController.testLogSourceConnection(
-      req.body
-    );
-    res.status(200).json(result);
-  } catch (error) {
-    next(error);
-  }
+app.post("/test-log-source-connection", async (req, res) => {
+  const result = await logAnalysisController.testLogSourceConnection(req.body);
+  return res.status(200).json(result);
+});
+
+app.post("/test-log-anomaly-detection", async (req, res) => {
+  const result = await logAnalysisController.testLogAnomalyDetection(req.body);
+  return res.status(200).json(result);
 });
 
 // Global error handler middleware

@@ -13,7 +13,10 @@ export class AIOpsStack extends cdk.Stack {
       {
         handler: "handler",
         entry: path.join(__dirname, "./apiHandler.ts"),
-        timeout: cdk.Duration.seconds(5),
+        timeout: cdk.Duration.seconds(15),
+        environment: {
+          OPENAI_API_KEY: process.env.OPENAI_API_KEY || "",
+        },
       }
     );
 

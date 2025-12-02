@@ -1,7 +1,11 @@
 #!/usr/bin/env node
 import * as cdk from "aws-cdk-lib";
+import { config } from "dotenv";
 import "source-map-support/register";
 import { AIOpsStack } from "../lib/aiops-stack";
+
+// Load environment variables from .env file
+config({ path: require("path").join(__dirname, "../../.env") });
 
 const app = new cdk.App();
 new AIOpsStack(app, "AIOpsStack", {
