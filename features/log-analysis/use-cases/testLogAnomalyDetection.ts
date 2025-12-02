@@ -1,17 +1,22 @@
-import { LogAnomalyTestReportDTO } from "../dtos/logAnomalyTestReport.dto";
+import { inject, injectable } from "tsyringe";
+import { LogAnomalyTestReportDTO } from "../dtos/log-anomaly-report.dto";
+import { LogSourceConfig } from "../dtos/log-source.dto";
 import { ILogAnomalyDetector } from "../ports/ILogAnomalyDetector";
-import { ILogFetcher } from "../ports/ILogFetcher";
+import { ILogSourceFactory } from "../ports/ILogSourceFactory";
 
+@injectable()
 export class TestLogAnomalyDetection {
   constructor(
-    private _logFetcher: ILogFetcher,
-    private _anomalyDetector: ILogAnomalyDetector
+    @inject("ILogSourceFactory") private logSourceFactory: ILogSourceFactory,
+    @inject("ILogAnomalyDetector") private anomalyDetector: ILogAnomalyDetector
   ) {}
 
-  async execute() {
+  async execute(config: LogSourceConfig) {
     try {
-      const { logs: rawLogs } = await this._logFetcher.fetchLogs();
-      const anomalies = await this._anomalyDetector.detectAnomalies({
+      const { logs: rawLogs } = await this.logSourceFactory
+        .getLogSource(config)
+        .fetchLogs();
+      const anomalies = await this.anomalyDetector.detectAnomalies({
         logs: rawLogs.slice(0, 50),
       });
 

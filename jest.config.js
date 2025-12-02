@@ -1,5 +1,4 @@
 const { createDefaultPreset } = require("ts-jest");
-require("dotenv").config({ path: ".env.test" });
 
 const tsJestTransformCfg = createDefaultPreset().transform;
 
@@ -9,5 +8,6 @@ module.exports = {
   transform: {
     ...tsJestTransformCfg,
   },
+  setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
   testPathIgnorePatterns: [".*\\.integration\\.test\\.ts$"],
 };

@@ -1,10 +1,8 @@
 import axios, { AxiosInstance } from "axios";
-import { FetchLogFilter, ILogFetcher } from "../ports/ILogFetcher";
-import { ILogSourceConnectionChecker } from "../ports/ILogSourceConnectionChecker";
+import { LogSourceConnectionResponse } from "../dtos/log-source.dto";
+import { ILogSource } from "../ports/ILogSource";
 
-export class ZabbixLogSource
-  implements ILogSourceConnectionChecker, ILogFetcher
-{
+export class ZabbixLogSource implements ILogSource {
   private client: AxiosInstance;
   private authToken?: string;
 
@@ -17,6 +15,9 @@ export class ZabbixLogSource
         "Content-Type": "application/json",
       },
     });
+  }
+  testConnection(): Promise<LogSourceConnectionResponse> {
+    throw new Error("Method not implemented.");
   }
 
   async checkConnection(): Promise<{ success: boolean; message?: string }> {
@@ -34,9 +35,7 @@ export class ZabbixLogSource
     }
   }
 
-  async fetchLogs(
-    filter?: FetchLogFilter
-  ): Promise<{ logs: string[]; count: number }> {
+  async fetchLogs(): Promise<{ logs: string[]; count: number }> {
     try {
       await this.authenticate();
 

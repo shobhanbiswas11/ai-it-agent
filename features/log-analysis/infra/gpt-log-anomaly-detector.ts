@@ -1,14 +1,21 @@
 import OpenAI from "openai";
+import { injectable } from "tsyringe";
 import {
   AnomalyDetectionPayload,
   AnomalyDetectionResponse,
   ILogAnomalyDetector,
 } from "../ports/ILogAnomalyDetector";
 
+@injectable()
 export class GptLogAnomalyDetector implements ILogAnomalyDetector {
   private client: OpenAI;
+  private model: string = "gpt-4o-mini";
 
-  constructor(apiKey: string, private model: string = "gpt-4o-mini") {
+  constructor() {
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+      throw new Error("OPENAI_API_KEY environment variable is required");
+    }
     this.client = new OpenAI({ apiKey });
   }
 

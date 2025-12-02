@@ -1,5 +1,5 @@
 import { ILogAnomalyDetector } from "../../ports/ILogAnomalyDetector";
-import { ILogFetcher } from "../../ports/ILogFetcher";
+import { ILogSource } from "../../ports/ILogSource";
 import { TestLogAnomalyDetection } from "../testLogAnomalyDetection";
 
 describe("test log anomaly detection", () => {
@@ -13,10 +13,11 @@ describe("test log anomaly detection", () => {
       ],
     };
 
-    const logFetcher: jest.Mocked<ILogFetcher> = {
+    const logSource: jest.Mocked<ILogSource> = {
       fetchLogs: jest
         .fn()
         .mockResolvedValue({ logs: mockLogs, count: mockLogs.length }),
+      testConnection: jest.fn(),
     };
 
     const anomalyDetector: jest.Mocked<ILogAnomalyDetector> = {
@@ -24,15 +25,15 @@ describe("test log anomaly detection", () => {
     };
 
     const testLogAnomalyDetection = new TestLogAnomalyDetection(
-      logFetcher,
+      { getLogSource: () => logSource },
       anomalyDetector
     );
 
     // Execute
-    const report = await testLogAnomalyDetection.execute();
+    const report = await testLogAnomalyDetection.execute({} as any);
 
     // Assertions
-    expect(logFetcher.fetchLogs).toHaveBeenCalledTimes(1);
+    expect(logSource.fetchLogs).toHaveBeenCalledTimes(1);
     expect(anomalyDetector.detectAnomalies).toHaveBeenCalledWith({
       logs: mockLogs.slice(0, 50),
     });
