@@ -1,5 +1,4 @@
 import axios, { AxiosInstance } from "axios";
-import { LogSourceConnectionResponse } from "../dtos/log-source.dto";
 import { ILogSource } from "../ports/ILogSource";
 
 export class ZabbixLogSource implements ILogSource {
@@ -16,11 +15,8 @@ export class ZabbixLogSource implements ILogSource {
       },
     });
   }
-  testConnection(): Promise<LogSourceConnectionResponse> {
-    throw new Error("Method not implemented.");
-  }
 
-  async checkConnection(): Promise<{ success: boolean; message?: string }> {
+  async testConnection(): Promise<{ success: boolean; message?: string }> {
     try {
       await this.authenticate();
       return {
