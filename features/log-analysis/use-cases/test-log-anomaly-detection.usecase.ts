@@ -1,8 +1,8 @@
 import { inject, injectable } from "tsyringe";
 import { LogAnomalyTestReportDTO } from "../dtos/log-anomaly-report.dto";
 import { LogSourceConfig } from "../dtos/log-source.dto";
-import { ILogAnomalyDetector } from "../ports/ILogAnomalyDetector";
-import { ILogSourceFactory } from "../ports/ILogSourceFactory";
+import { ILogAnomalyDetector } from "../ports/log-anomaly-detector.port";
+import { ILogSourceFactory } from "../ports/log-source.factory.port";
 
 @injectable()
 export class TestLogAnomalyDetection {

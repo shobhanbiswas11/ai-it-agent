@@ -1,5 +1,5 @@
 import { Log } from "../domain/log.entity";
-import { ILogAnomalyDetector } from "../ports/ILogAnomalyDetector";
+import { ILogAnomalyDetector } from "../ports/log-anomaly-detector.port";
 
 export class DetectAnomalousLogs {
   constructor(private _anomalyDetector: ILogAnomalyDetector) {}

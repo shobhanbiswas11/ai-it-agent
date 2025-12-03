@@ -1,7 +1,7 @@
 import express from "express";
 import "reflect-metadata";
 import { treeifyError, ZodError } from "zod";
-import { LogAnalysisController } from "./controllers//logAnalysisController";
+import { LogAnalysisController } from "./controllers/log-analysis.controller";
 
 const app = express();
 app.use(express.json());

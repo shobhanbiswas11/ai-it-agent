@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import { GptLogAnomalyDetector } from "../gpt-log-anomaly-detector";
+import { GptLogAnomalyDetector } from "../gpt-log-anomaly-detector.adapter";
 
 describe("GptLogAnomalyDetector Integration Test", () => {
   let detector: GptLogAnomalyDetector;

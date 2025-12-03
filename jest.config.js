@@ -1,4 +1,5 @@
 const { createDefaultPreset } = require("ts-jest");
+require("dotenv").config({ path: ".env.test", debug: false });
 
 const tsJestTransformCfg = createDefaultPreset().transform;
 

@@ -4,7 +4,7 @@ import {
   AnomalyDetectionPayload,
   AnomalyDetectionResponse,
   ILogAnomalyDetector,
-} from "../ports/ILogAnomalyDetector";
+} from "../ports/log-anomaly-detector.port";
 
 @injectable()
 export class GptLogAnomalyDetector implements ILogAnomalyDetector {

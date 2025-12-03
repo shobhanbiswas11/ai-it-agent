@@ -1,4 +1,4 @@
-import { ZabbixLogSource } from "../zabbix-log-source";
+import { ZabbixLogSource } from "../zabbix-log-source.adapter";
 
 describe("Zabbix Test", () => {
   let zabbixLogSource: ZabbixLogSource;

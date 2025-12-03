@@ -1,7 +1,7 @@
 import { injectable } from "tsyringe";
 import { LogSourceConfig } from "../dtos/log-source.dto";
-import { ILogSourceFactory } from "../ports/ILogSourceFactory";
-import { ZabbixLogSource } from "./zabbix-log-source";
+import { ILogSourceFactory } from "../ports/log-source.factory.port";
+import { ZabbixLogSource } from "./zabbix-log-source.adapter";
 
 @injectable()
 export class LogSourceFactory implements ILogSourceFactory {

@@ -1,6 +1,6 @@
 import { Log } from "../../domain/log.entity";
-import { ILogAnomalyDetector } from "../../ports/ILogAnomalyDetector";
-import { DetectAnomalousLogs } from "../detectAnomalousLogs";
+import { ILogAnomalyDetector } from "../../ports/log-anomaly-detector.port";
+import { DetectAnomalousLogs } from "../detect-anomalous-logs.usecase";
 
 describe("anomalous logs detection", () => {
   let anomalyDetector: jest.Mocked<ILogAnomalyDetector>;

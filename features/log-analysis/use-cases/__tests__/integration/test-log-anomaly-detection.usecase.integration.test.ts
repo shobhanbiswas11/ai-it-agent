@@ -1,8 +1,8 @@
-import { GptLogAnomalyDetector } from "../../../infra/gpt-log-anomaly-detector";
-import { LogSourceFactory } from "../../../infra/log-source-factory";
-import { ILogAnomalyDetector } from "../../../ports/ILogAnomalyDetector";
-import { ILogSourceFactory } from "../../../ports/ILogSourceFactory";
-import { TestLogAnomalyDetection } from "../../testLogAnomalyDetection";
+import { GptLogAnomalyDetector } from "../../../infra/gpt-log-anomaly-detector.adapter";
+import { LogSourceFactory } from "../../../infra/log-source.factory";
+import { ILogAnomalyDetector } from "../../../ports/log-anomaly-detector.port";
+import { ILogSourceFactory } from "../../../ports/log-source.factory.port";
+import { TestLogAnomalyDetection } from "../../test-log-anomaly-detection.usecase";
 
 describe("Test log anomaly detection", () => {
   test("should fetch logs and run anomaly detection", async () => {

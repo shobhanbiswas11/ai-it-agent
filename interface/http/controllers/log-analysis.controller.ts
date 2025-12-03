@@ -1,7 +1,7 @@
 import { container } from "../../../features/log-analysis/container";
 import { logSourceConfigSchema } from "../../../features/log-analysis/dtos/log-source.dto";
-import { CheckLogSourceConnection } from "../../../features/log-analysis/use-cases/checkLogSourceConnection";
-import { TestLogAnomalyDetection } from "../../../features/log-analysis/use-cases/testLogAnomalyDetection";
+import { CheckLogSourceConnection } from "../../../features/log-analysis/use-cases/check-log-source-connection.usecase";
+import { TestLogAnomalyDetection } from "../../../features/log-analysis/use-cases/test-log-anomaly-detection.usecase";
 
 export class LogAnalysisController {
   constructor() {}

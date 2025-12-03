@@ -1,6 +1,6 @@
-import { ILogAnomalyDetector } from "../../ports/ILogAnomalyDetector";
-import { ILogSource } from "../../ports/ILogSource";
-import { TestLogAnomalyDetection } from "../testLogAnomalyDetection";
+import { ILogAnomalyDetector } from "../../ports/log-anomaly-detector.port";
+import { ILogSource } from "../../ports/log-source.port";
+import { TestLogAnomalyDetection } from "../test-log-anomaly-detection.usecase";
 
 describe("test log anomaly detection", () => {
   it("should take first 50 logs and run anomaly detection", async () => {

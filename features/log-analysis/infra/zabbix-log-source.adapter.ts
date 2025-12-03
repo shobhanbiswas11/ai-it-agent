@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from "axios";
-import { ILogSource } from "../ports/ILogSource";
+import { ILogSource } from "../ports/log-source.port";
 
 export class ZabbixLogSource implements ILogSource {
   private client: AxiosInstance;
