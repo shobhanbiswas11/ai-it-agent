@@ -1,6 +1,7 @@
 import express from "express";
 import { treeifyError, ZodError } from "zod";
 import { container } from "../../di/container";
+import { KnowledgeBaseController } from "./controllers/kb.controller";
 import { LogAnalysisController } from "./controllers/log-analysis.controller";
 import { ToolController } from "./controllers/tool.controller";
 
@@ -9,6 +10,10 @@ app.use(express.json());
 
 const logAnalysisController = container.resolve(LogAnalysisController);
 const toolController = container.resolve(ToolController);
+const kbController = new KnowledgeBaseController();
+
+// Knowledge Base routes
+app.use("/api/kb", kbController.router);
 
 app.post("/test-log-source-connection", async (req, res) => {
   const result = await logAnalysisController.testLogSourceConnection(req.body);
