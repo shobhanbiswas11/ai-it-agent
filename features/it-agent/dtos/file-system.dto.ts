@@ -1,5 +1,5 @@
 import z from "zod";
-import { sshSchema } from "./ssh";
+import { sshSchema } from "./ssh.dto";
 
 export const fileSystemSchema = z.discriminatedUnion("type", [
   z.object({

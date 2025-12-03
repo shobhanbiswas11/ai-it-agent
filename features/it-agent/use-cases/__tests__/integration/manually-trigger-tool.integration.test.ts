@@ -1,8 +1,8 @@
 import * as fs from "fs/promises";
 import { resolve } from "path";
 import { container } from "../../../container";
-import { ToolNames } from "../../../dtos/tool";
-import { ManuallyTriggerTool } from "../../manuallyTriggerTool";
+import { LanguageLibraryCleaner } from "../../../tools/language-library-cleaner.tool";
+import { ManuallyTriggerTool } from "../../manually-trigger-tool.usecase";
 
 describe("Manually Trigger Tools", () => {
   const tmpPath = resolve(process.cwd(), "tmp");
@@ -47,8 +47,8 @@ describe("Manually Trigger Tools", () => {
     const uc = container.resolve(ManuallyTriggerTool);
 
     await uc.execute({
-      toolName: ToolNames.LanguageLibraryCleaner,
-      params: {
+      toolName: LanguageLibraryCleaner.toolName,
+      config: {
         fileSystemConfig: {
           type: "local",
         },
@@ -92,8 +92,8 @@ describe("Manually Trigger Tools", () => {
     const uc = container.resolve(ManuallyTriggerTool);
 
     await uc.execute({
-      toolName: ToolNames.LanguageLibraryCleaner,
-      params: {
+      toolName: LanguageLibraryCleaner.toolName,
+      config: {
         fileSystemConfig: {
           type: "local",
         },
@@ -135,8 +135,8 @@ describe("Manually Trigger Tools", () => {
 
     await expect(
       uc.execute({
-        toolName: ToolNames.LanguageLibraryCleaner,
-        params: {
+        toolName: LanguageLibraryCleaner.toolName,
+        config: {
           fileSystemConfig: {
             type: "local",
           },

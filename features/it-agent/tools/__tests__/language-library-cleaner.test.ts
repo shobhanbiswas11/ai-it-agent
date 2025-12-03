@@ -1,5 +1,5 @@
-import { IFileSystem } from "../../ports/IFileSystem";
-import { LanguageLibraryCleaner } from "../languageLibraryCleaner";
+import { IFileSystem } from "../../ports/file-system.port";
+import { LanguageLibraryCleaner } from "../language-library-cleaner.tool";
 
 describe("Language Library Cleaner", () => {
   let languageLibraryCleaner: LanguageLibraryCleaner;

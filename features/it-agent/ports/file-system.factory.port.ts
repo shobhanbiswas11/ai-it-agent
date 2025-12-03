@@ -1,5 +1,5 @@
-import { FileSystemConfig } from "../dtos/fileSystem";
-import { IFileSystem } from "./IFileSystem";
+import { FileSystemConfig } from "../dtos/file-system.dto";
+import { IFileSystem } from "./file-system.port";
 
 export interface IFileSystemFactory {
   getFileSystem(fileSystemConfig: FileSystemConfig): IFileSystem;

@@ -1,9 +1,9 @@
 import { ZodType } from "zod";
-import { ToolInput, ToolNames } from "../dtos/tool";
 
 export abstract class Tool {
-  abstract name: ToolNames;
-  abstract description: string;
-  abstract inputSchema?: ZodType;
-  abstract execute(props: ToolInput["params"]): any;
+  static toolName: string;
+  static description: string;
+  static paramsSchema?: ZodType;
+
+  abstract execute(params: any): Promise<any> | any;
 }

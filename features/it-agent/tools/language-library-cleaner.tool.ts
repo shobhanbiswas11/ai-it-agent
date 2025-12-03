@@ -1,21 +1,36 @@
 import { inject, injectable } from "tsyringe";
-import {
-  LanguageLibraryCleanerInput,
-  languageLibraryCleanerInputSchema,
-  ToolNames,
-} from "../dtos/tool";
+import z from "zod";
+import { fileSystemSchema } from "../dtos/file-system.dto";
 import {
   IFileSystemFactory,
   IFileSystemFactoryToken,
-} from "../ports/IFileSystemFactory";
-import { LoggingService } from "../services/loggingService";
+} from "../ports/file-system.factory.port";
+import { LoggingService } from "../services/logging.service";
 import { Tool } from "./tool";
 
 @injectable()
 export class LanguageLibraryCleaner extends Tool {
-  name: ToolNames.LanguageLibraryCleaner;
-  description: "Cleans up unnecessary language library directories (node_modules, venv) from the file system.";
-  inputSchema = languageLibraryCleanerInputSchema;
+  static toolName = "language_library_cleaner";
+  static description =
+    "Cleans up unnecessary language library directories (node_modules, venv) from the file system.";
+  static paramsSchema = z.object({
+    fileSystemConfig: fileSystemSchema,
+    config: z.object({
+      basePath: z.string().describe("The base path to start cleaning from."),
+      libs: z
+        .array(z.enum(["node_modules", ".venv"]))
+        .optional()
+        .describe(
+          "The language library directories to clean up. Defaults to ['node_modules', '.venv']."
+        ),
+      recursive: z
+        .boolean()
+        .optional()
+        .describe(
+          "Whether to clean up directories recursively. Defaults to false."
+        ),
+    }),
+  });
 
   constructor(
     @inject(IFileSystemFactoryToken)
@@ -28,7 +43,7 @@ export class LanguageLibraryCleaner extends Tool {
   async execute({
     config,
     fileSystemConfig,
-  }: LanguageLibraryCleanerInput): Promise<void> {
+  }: z.infer<typeof LanguageLibraryCleaner.paramsSchema>): Promise<void> {
     const {
       basePath,
       libs = ["node_modules", ".venv"],

@@ -1,8 +1,8 @@
 import { injectable } from "tsyringe";
-import { FileSystemConfig } from "../dtos/fileSystem";
-import { IFileSystem } from "../ports/IFileSystem";
-import { IFileSystemFactory } from "../ports/IFileSystemFactory";
-import { LocalFileSystem } from "./localFileSystem";
+import { FileSystemConfig } from "../dtos/file-system.dto";
+import { IFileSystemFactory } from "../ports/file-system.factory.port";
+import { IFileSystem } from "../ports/file-system.port";
+import { LocalFileSystem } from "./local-file-system.adapter";
 
 @injectable()
 export class FileSystemFactory implements IFileSystemFactory {

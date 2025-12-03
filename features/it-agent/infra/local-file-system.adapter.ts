@@ -1,5 +1,5 @@
 import * as fs from "fs/promises";
-import { IFileSystem } from "../ports/IFileSystem";
+import { IFileSystem } from "../ports/file-system.port";
 
 export class LocalFileSystem implements IFileSystem {
   async readDirectory(dirPath: string): Promise<string[]> {
