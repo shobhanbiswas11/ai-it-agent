@@ -1,3 +1,4 @@
+import Database from "better-sqlite3";
 import { injectable } from "tsyringe";
 import { Ticket } from "../domain/ticket.entity";
 import {
@@ -7,394 +8,126 @@ import {
   TicketRepositoryPort,
 } from "../ports/ticket.repository.port";
 
-interface TicketRecord {
-  id: string;
-  kbId: string;
-  text: string;
-  metadata: Record<string, any>;
-  createdAt: Date;
-}
-
 /**
- * In-memory ticket repository (SQL-like operations)
- * Can be replaced with actual SQL database (PostgreSQL, MySQL, etc.)
+ * SQLite-based ticket repository
  */
 @injectable()
-export class InMemoryTicketRepository implements TicketRepositoryPort {
-  private tickets: Map<string, TicketRecord> = new Map();
-  private kbIndex: Map<string, Set<string>> = new Map(); // kbId -> Set of ticket IDs
+export class SQLiteTicketRepository implements TicketRepositoryPort {
+  private db: Database.Database;
+
+  constructor() {
+    const dbPath = process.env.SQLITE_DB_PATH || "./data/tickets.db";
+    this.db = new Database(dbPath);
+    this.initializeSchema();
+  }
+
+  private initializeSchema() {
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS tickets (
+        id TEXT PRIMARY KEY,
+        kb_id TEXT NOT NULL,
+        text TEXT NOT NULL,
+        metadata TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE INDEX IF NOT EXISTS idx_kb_id ON tickets(kb_id);
+    `);
+  }
 
   async saveTickets(kbId: string, tickets: Ticket[]): Promise<void> {
-    if (!this.kbIndex.has(kbId)) {
-      this.kbIndex.set(kbId, new Set());
-    }
+    const insert = this.db.prepare(`
+      INSERT OR REPLACE INTO tickets (id, kb_id, text, metadata)
+      VALUES (?, ?, ?, ?)
+    `);
 
-    const kbTickets = this.kbIndex.get(kbId)!;
+    const insertMany = this.db.transaction((tickets: Ticket[]) => {
+      for (const ticket of tickets) {
+        insert.run(
+          ticket.id,
+          kbId,
+          ticket.text,
+          JSON.stringify(ticket.metadata || {})
+        );
+      }
+    });
 
-    for (const ticket of tickets) {
-      const record: TicketRecord = {
-        id: ticket.id,
-        kbId,
-        text: ticket.text,
-        metadata: ticket.metadata || {},
-        createdAt: new Date(),
-      };
-
-      this.tickets.set(ticket.id, record);
-      kbTickets.add(ticket.id);
-    }
-
-    console.log(`Saved ${tickets.length} tickets to KB ${kbId} in SQL store`);
+    insertMany(tickets);
+    console.log(`Saved ${tickets.length} tickets to KB ${kbId} in SQLite`);
   }
 
   async findTickets(filter: TicketFilter): Promise<Ticket[]> {
-    let results: TicketRecord[] = Array.from(this.tickets.values());
+    let query = "SELECT * FROM tickets WHERE 1=1";
+    const params: any[] = [];
 
-    // Filter by KB
     if (filter.kbId) {
-      const kbTicketIds = this.kbIndex.get(filter.kbId);
-      if (!kbTicketIds) return [];
-      results = results.filter((t) => kbTicketIds.has(t.id));
+      query += " AND kb_id = ?";
+      params.push(filter.kbId);
     }
 
-    // Filter by IDs
     if (filter.ids && filter.ids.length > 0) {
-      const idSet = new Set(filter.ids);
-      results = results.filter((t) => idSet.has(t.id));
+      query += ` AND id IN (${filter.ids.map(() => "?").join(",")})`;
+      params.push(...filter.ids);
     }
 
-    // Filter by metadata
-    if (filter.metadata) {
-      results = results.filter((t) => {
-        return Object.entries(filter.metadata!).every(
-          ([key, value]) => t.metadata[key] === value
-        );
-      });
-    }
+    const rows = this.db.prepare(query).all(...params) as any[];
 
-    return results.map(this.recordToTicket);
+    return rows.map(
+      (row) =>
+        new Ticket({
+          id: row.id,
+          text: row.text,
+          metadata: JSON.parse(row.metadata || "{}"),
+        })
+    );
   }
 
   async queryWithAggregations(
     kbId: string,
     aggregationQuery: Record<string, any>
   ): Promise<TicketQueryResult> {
-    const kbTicketIds = this.kbIndex.get(kbId);
-    if (!kbTicketIds) {
-      return { tickets: [], total: 0, aggregations: {} };
-    }
-
-    const tickets = Array.from(kbTicketIds)
-      .map((id) => this.tickets.get(id)!)
-      .filter(Boolean);
-
-    // Simple aggregation example
-    const aggregations: Record<string, any> = {};
-
-    // Count by metadata field
-    if (aggregationQuery.countBy) {
-      const field = aggregationQuery.countBy;
-      const counts: Record<string, number> = {};
-
-      for (const ticket of tickets) {
-        const value = ticket.metadata[field];
-        if (value !== undefined) {
-          counts[String(value)] = (counts[String(value)] || 0) + 1;
-        }
-      }
-
-      aggregations[`${field}_counts`] = counts;
-    }
-
-    // Average numeric field
-    if (aggregationQuery.average) {
-      const field = aggregationQuery.average;
-      const values = tickets
-        .map((t) => t.metadata[field])
-        .filter((v) => typeof v === "number");
-
-      if (values.length > 0) {
-        const sum = values.reduce((a, b) => a + b, 0);
-        aggregations[`${field}_average`] = sum / values.length;
-      }
-    }
-
-    return {
-      tickets: tickets.map(this.recordToTicket),
-      total: tickets.length,
-      aggregations,
-    };
+    const tickets = await this.findTickets({ kbId });
+    return { tickets, total: tickets.length, aggregations: {} };
   }
 
   async deleteByKnowledgeBase(kbId: string): Promise<void> {
-    const kbTicketIds = this.kbIndex.get(kbId);
-    if (!kbTicketIds) return;
-
-    for (const id of kbTicketIds) {
-      this.tickets.delete(id);
-    }
-
-    this.kbIndex.delete(kbId);
-    console.log(`Deleted all tickets for KB ${kbId} from SQL store`);
+    this.db.prepare("DELETE FROM tickets WHERE kb_id = ?").run(kbId);
   }
 
   async countByKnowledgeBase(kbId: string): Promise<number> {
-    const kbTicketIds = this.kbIndex.get(kbId);
-    return kbTicketIds ? kbTicketIds.size : 0;
+    const result = this.db
+      .prepare("SELECT COUNT(*) as count FROM tickets WHERE kb_id = ?")
+      .get(kbId) as { count: number };
+    return result.count;
   }
 
-  /**
-   * Execute SQL query generated by LLM
-   * Simulates SQL execution against in-memory data
-   */
   async executeSQLQuery(
     sqlQuery: string,
     kbIds: string[]
   ): Promise<SQLQueryResult> {
-    // Get all tickets from specified KBs
-    let allTickets: TicketRecord[] = [];
-
-    for (const kbId of kbIds) {
-      const kbTicketIds = this.kbIndex.get(kbId);
-      if (!kbTicketIds) continue;
-
-      const tickets = Array.from(kbTicketIds)
-        .map((id) => this.tickets.get(id)!)
-        .filter(Boolean);
-
-      allTickets = allTickets.concat(tickets);
-    }
-
-    // Simple SQL parser and executor
-    const result = this.executeSQLOnData(sqlQuery, allTickets);
-
-    console.log(`Executed SQL: ${sqlQuery}`);
-    console.log(`Result: ${result.rowCount} rows`);
-
-    return result;
-  }
-
-  /**
-   * Simple SQL interpreter for common queries
-   * Handles: SELECT, COUNT, WHERE, GROUP BY, ORDER BY, AVG, SUM, etc.
-   */
-  private executeSQLOnData(sql: string, data: TicketRecord[]): SQLQueryResult {
-    const normalized = sql.trim().toLowerCase();
-
-    // Parse SELECT clause
-    const selectMatch = normalized.match(/select\s+(.+?)\s+from/);
-    if (!selectMatch) {
-      throw new Error("Invalid SQL: No SELECT clause");
-    }
-
-    const selectClause = selectMatch[1].trim();
-
-    // Parse WHERE clause
-    let filteredData = data;
-    const whereMatch = normalized.match(
-      /where\s+(.+?)(?:\s+group\s+by|\s+order\s+by|$)/
-    );
-    if (whereMatch) {
-      const whereClause = whereMatch[1].trim();
-      filteredData = this.filterByWhere(data, whereClause);
-    }
-
-    // Handle aggregations
-    if (
-      selectClause.includes("count") ||
-      selectClause.includes("avg") ||
-      selectClause.includes("sum") ||
-      selectClause.includes("max") ||
-      selectClause.includes("min")
-    ) {
-      return this.executeAggregation(selectClause, filteredData, normalized);
-    }
-
-    // Handle simple SELECT
-    const fields =
-      selectClause === "*"
-        ? ["id", "text", "metadata", "kbId", "createdAt"]
-        : selectClause.split(",").map((f) => f.trim());
-
-    const rows = filteredData.map((record) => {
-      const row: any = {};
-      fields.forEach((field) => {
-        if (field === "*" || field === "id") row.id = record.id;
-        if (field === "*" || field === "text") row.text = record.text;
-        if (field === "*" || field === "kbid") row.kbId = record.kbId;
-        if (field === "*" || field === "createdat")
-          row.createdAt = record.createdAt;
-
-        // Metadata fields
-        if (field.startsWith("metadata.")) {
-          const metaField = field.replace("metadata.", "");
-          row[metaField] = record.metadata[metaField];
-        }
-      });
-      return row;
-    });
-
-    return {
-      rows,
-      rowCount: rows.length,
-      fields,
-    };
-  }
-
-  private filterByWhere(
-    data: TicketRecord[],
-    whereClause: string
-  ): TicketRecord[] {
-    return data.filter((record) => {
-      // Simple condition parser
-      // Supports: metadata.field = 'value', metadata.field > number, etc.
-
-      // Handle AND conditions
-      const conditions = whereClause.split(/\s+and\s+/);
-
-      return conditions.every((condition) => {
-        const match = condition.match(
-          /metadata\.(\w+)\s*(=|>|<|>=|<=|like)\s*['"]?(.+?)['"]?$/
-        );
-        if (!match) return true; // Skip unparseable conditions
-
-        const [, field, operator, value] = match;
-        const recordValue = record.metadata[field];
-
-        switch (operator) {
-          case "=":
-            return String(recordValue).toLowerCase() === value.toLowerCase();
-          case ">":
-            return Number(recordValue) > Number(value);
-          case "<":
-            return Number(recordValue) < Number(value);
-          case ">=":
-            return Number(recordValue) >= Number(value);
-          case "<=":
-            return Number(recordValue) <= Number(value);
-          case "like":
-            return String(recordValue)
-              .toLowerCase()
-              .includes(value.toLowerCase().replace(/%/g, ""));
-          default:
-            return true;
-        }
-      });
-    });
-  }
-
-  private executeAggregation(
-    selectClause: string,
-    data: TicketRecord[],
-    fullSQL: string
-  ): SQLQueryResult {
-    // Parse GROUP BY
-    const groupByMatch = fullSQL.match(/group\s+by\s+(.+?)(?:\s+order\s+by|$)/);
-
-    if (groupByMatch) {
-      const groupByField = groupByMatch[1].trim().replace("metadata.", "");
-      return this.executeGroupBy(selectClause, data, groupByField);
-    }
-
-    // Simple aggregation without GROUP BY
-    const rows: any = {};
-
-    if (selectClause.includes("count(*)") || selectClause.includes("count(")) {
-      rows.count = data.length;
-    }
-
-    if (selectClause.includes("avg(")) {
-      const avgMatch = selectClause.match(/avg\(metadata\.(\w+)\)/);
-      if (avgMatch) {
-        const field = avgMatch[1];
-        const values = data
-          .map((r) => Number(r.metadata[field]))
-          .filter((v) => !isNaN(v));
-        rows[`avg_${field}`] =
-          values.length > 0
-            ? values.reduce((a, b) => a + b, 0) / values.length
-            : 0;
-      }
-    }
-
-    if (selectClause.includes("sum(")) {
-      const sumMatch = selectClause.match(/sum\(metadata\.(\w+)\)/);
-      if (sumMatch) {
-        const field = sumMatch[1];
-        const values = data
-          .map((r) => Number(r.metadata[field]))
-          .filter((v) => !isNaN(v));
-        rows[`sum_${field}`] = values.reduce((a, b) => a + b, 0);
-      }
-    }
-
-    return {
-      rows: [rows],
-      rowCount: 1,
-      fields: Object.keys(rows),
-    };
-  }
-
-  private executeGroupBy(
-    selectClause: string,
-    data: TicketRecord[],
-    groupByField: string
-  ): SQLQueryResult {
-    const groups = new Map<string, TicketRecord[]>();
-
-    // Group data
-    data.forEach((record) => {
-      const groupValue = String(record.metadata[groupByField] || "null");
-      if (!groups.has(groupValue)) {
-        groups.set(groupValue, []);
-      }
-      groups.get(groupValue)!.push(record);
-    });
-
-    // Calculate aggregations for each group
-    const rows: any[] = [];
-
-    groups.forEach((groupData, groupValue) => {
-      const row: any = {};
-      row[groupByField] = groupValue;
-
-      if (selectClause.includes("count(*)")) {
-        row.count = groupData.length;
-      }
-
-      if (selectClause.includes("avg(")) {
-        const avgMatch = selectClause.match(/avg\(metadata\.(\w+)\)/);
-        if (avgMatch) {
-          const field = avgMatch[1];
-          const values = groupData
-            .map((r) => Number(r.metadata[field]))
-            .filter((v) => !isNaN(v));
-          row[`avg_${field}`] =
-            values.length > 0
-              ? values.reduce((a, b) => a + b, 0) / values.length
-              : 0;
+    try {
+      let finalQuery = sqlQuery;
+      if (kbIds.length > 0 && !sqlQuery.toLowerCase().includes("kb_id")) {
+        const kbFilter = `kb_id IN (${kbIds.map(() => "?").join(",")})`;
+        if (sqlQuery.toLowerCase().includes("where")) {
+          finalQuery = sqlQuery.replace(/where/i, `WHERE ${kbFilter} AND`);
+        } else {
+          finalQuery = sqlQuery.replace(
+            /from\s+tickets/i,
+            `FROM tickets WHERE ${kbFilter}`
+          );
         }
       }
 
-      rows.push(row);
-    });
+      const stmt = this.db.prepare(finalQuery);
+      const rows: any[] = kbIds.length > 0 ? stmt.all(...kbIds) : stmt.all();
 
-    return {
-      rows,
-      rowCount: rows.length,
-      fields: Object.keys(rows[0] || {}),
-    };
-  }
-
-  private recordToTicket(record: TicketRecord): Ticket {
-    return new Ticket({
-      id: record.id,
-      text: record.text,
-      metadata: {
-        ...record.metadata,
-        kbId: record.kbId,
-        createdAt: record.createdAt.toISOString(),
-      },
-    });
+      return {
+        rows,
+        rowCount: rows.length,
+        fields: rows.length > 0 ? Object.keys(rows[0]) : [],
+      };
+    } catch (error: any) {
+      throw new Error(`SQL execution failed: ${error.message}`);
+    }
   }
 }

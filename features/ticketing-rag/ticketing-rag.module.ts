@@ -7,7 +7,7 @@ import { QueryAnalyzerPort } from "./ports/query-analyzer.port";
 import { TicketRepositoryPort } from "./ports/ticket.repository.port";
 import { VectorStorePort } from "./ports/vector-store.port";
 import { KBRepository } from "./repos/kb.repo";
-import { InMemoryTicketRepository } from "./repos/ticket.repo";
+import { SQLiteTicketRepository } from "./repos/ticket.repo";
 import { CreateKnowledgeBase } from "./use-cases/create-kb.usecase";
 import { QueryKnowledgeBase } from "./use-cases/query-kb.usecase";
 
@@ -20,7 +20,7 @@ export function registerTicketingRAGModule() {
   container.registerSingleton(KBRepository);
   container.registerSingleton<TicketRepositoryPort>(
     "TicketRepositoryPort",
-    InMemoryTicketRepository
+    SQLiteTicketRepository
   );
 
   // Infrastructure adapters
