@@ -71,6 +71,7 @@ export class LanguageLibraryCleaner extends Tool {
         }
       } catch (error) {
         this._logger.log(`Error processing directory ${currentPath}: ${error}`);
+        throw new Error(`Error processing directory ${currentPath}: ${error}`);
       }
     };
 

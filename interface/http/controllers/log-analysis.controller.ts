@@ -1,18 +1,16 @@
-import { container } from "../../../features/log-analysis/container";
+import { injectable } from "tsyringe";
 import { logSourceConfigSchema } from "../../../features/log-analysis/dtos/log-source.dto";
 import { CheckLogSourceConnection } from "../../../features/log-analysis/use-cases/check-log-source-connection.usecase";
-import { TestLogAnomalyDetection } from "../../../features/log-analysis/use-cases/test-log-anomaly-detection.usecase";
 
+@injectable()
 export class LogAnalysisController {
-  constructor() {}
+  constructor(private uc: CheckLogSourceConnection) {}
 
   testLogSourceConnection(body: any) {
-    const uc = container.resolve(CheckLogSourceConnection);
-    return uc.execute(logSourceConfigSchema.parse(body));
+    return this.uc.execute(logSourceConfigSchema.parse(body));
   }
 
   testLogAnomalyDetection(body: any) {
-    const us = container.resolve(TestLogAnomalyDetection);
-    return us.execute(logSourceConfigSchema.parse(body));
+    return this.uc.execute(logSourceConfigSchema.parse(body));
   }
 }

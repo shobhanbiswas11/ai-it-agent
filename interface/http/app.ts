@@ -1,12 +1,14 @@
 import express from "express";
-import "reflect-metadata";
 import { treeifyError, ZodError } from "zod";
+import { container } from "../../di/container";
 import { LogAnalysisController } from "./controllers/log-analysis.controller";
+import { ToolController } from "./controllers/tool.controller";
 
 const app = express();
 app.use(express.json());
 
-const logAnalysisController = new LogAnalysisController();
+const logAnalysisController = container.resolve(LogAnalysisController);
+const toolController = container.resolve(ToolController);
 
 app.post("/test-log-source-connection", async (req, res) => {
   const result = await logAnalysisController.testLogSourceConnection(req.body);
@@ -16,6 +18,11 @@ app.post("/test-log-source-connection", async (req, res) => {
 app.post("/test-log-anomaly-detection", async (req, res) => {
   const result = await logAnalysisController.testLogAnomalyDetection(req.body);
   return res.status(200).json(result);
+});
+
+app.post("/trigger-tool", async (req, res) => {
+  const result = await toolController.triggerTool(req.body);
+  return res.status(200).json(result || { message: "Tool triggered" });
 });
 
 // Global error handler middleware

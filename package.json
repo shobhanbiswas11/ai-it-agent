@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "start": "ts-node main.ts",
     "test": "jest",
     "test:integration": "jest --config=jest.integration.config.js",
     "test:watch": "jest --watchAll"
