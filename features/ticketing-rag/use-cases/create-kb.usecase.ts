@@ -12,17 +12,6 @@ export interface CreateKBResult {
   ticketCount: number;
   vectorStorePath: string;
 }
-
-/**
- * Use case: Create a knowledge base from CSV upload
- *
- * Flow:
- * 1. Parse CSV buffer into Ticket entities
- * 2. Create KB entity in creating state
- * 3. Store tickets in SQL database (structured data)
- * 4. Vectorize and store in vector DB (semantic search)
- * 5. Mark KB as active
- */
 @injectable()
 export class CreateKnowledgeBase {
   constructor(
@@ -34,13 +23,7 @@ export class CreateKnowledgeBase {
 
   async execute(props: CreateKBDto): Promise<CreateKBResult> {
     try {
-      // 1. Parse CSV into tickets
-      const tickets = await this._csvParser.parse(props.fileBuffer, {
-        hasHeader: true,
-        // You can make these configurable via props
-        textColumns: undefined, // Use all columns for text by default
-        metadataColumns: undefined, // Store all columns as metadata
-      });
+      const tickets = await this._csvParser.parse(props.fileBuffer);
 
       if (tickets.length === 0) {
         throw new Error("No valid tickets found in CSV");

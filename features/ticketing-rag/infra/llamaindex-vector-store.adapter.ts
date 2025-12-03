@@ -1,4 +1,4 @@
-import { OpenAIEmbedding } from "@llamaindex/openai";
+import { OpenAI, OpenAIEmbedding } from "@llamaindex/openai";
 import * as fs from "fs/promises";
 import {
   Document,
@@ -25,6 +25,11 @@ export class LlamaIndexVectorStoreAdapter implements VectorStorePort {
     this.basePath = process.env.VECTOR_STORE_PATH || "./data/vector-store";
 
     // Configure LlamaIndex settings
+    Settings.llm = new OpenAI({
+      model: "gpt-4o-mini",
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+
     Settings.embedModel = new OpenAIEmbedding({
       model: "text-embedding-3-small",
       dimensions: 1536,

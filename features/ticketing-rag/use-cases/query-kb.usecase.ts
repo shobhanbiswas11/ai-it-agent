@@ -89,14 +89,20 @@ export class QueryKnowledgeBase {
         topK
       );
 
-      // Enrich with full ticket data
-      const ticketIds = vectorResults.map((r) => r.id);
+      // Enrich with full ticket data - use ticketId from metadata, not node id
+      const ticketIds = vectorResults
+        .map((r) => r.metadata?.ticketId)
+        .filter((id): id is string => !!id);
+
       const tickets = await this._ticketRepo.findTickets({ ids: ticketIds });
       const ticketMap = new Map(tickets.map((t) => [t.id, t]));
 
       semanticResults = vectorResults
         .map((result) => {
-          const ticket = ticketMap.get(result.id);
+          const ticketId = result.metadata?.ticketId;
+          if (!ticketId) return null;
+
+          const ticket = ticketMap.get(ticketId);
           if (!ticket) return null;
 
           return {
