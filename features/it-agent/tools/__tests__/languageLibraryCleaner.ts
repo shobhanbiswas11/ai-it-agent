@@ -1,8 +1,8 @@
 import { IFileSystem } from "../../ports/IFileSystem";
-import { DiskUtilityService } from "../diskUtilityService";
+import { LanguageLibraryCleaner } from "../languageLibraryCleaner";
 
-describe("Disk utility service", () => {
-  let diskUtilityService: DiskUtilityService;
+describe("Language Library Cleaner", () => {
+  let languageLibraryCleaner: LanguageLibraryCleaner;
   let fileSystemMock: jest.Mocked<IFileSystem>;
 
   beforeEach(() => {
@@ -12,9 +12,14 @@ describe("Disk utility service", () => {
       removeDirectory: jest.fn(),
     };
 
-    diskUtilityService = new DiskUtilityService(fileSystemMock, {
-      log: jest.fn(),
-    });
+    languageLibraryCleaner = new LanguageLibraryCleaner(
+      {
+        getFileSystem: jest.fn().mockReturnValue(fileSystemMock),
+      },
+      {
+        log: jest.fn(),
+      }
+    );
   });
 
   it("Clean up all the language library directories", async () => {
@@ -35,9 +40,9 @@ describe("Disk utility service", () => {
       return false;
     });
 
-    await diskUtilityService.cleanUpLanguageLibDirectories({
-      basePath: "/project",
-      recursive: false,
+    await languageLibraryCleaner.execute({
+      config: { basePath: "/project" },
+      fileSystemConfig: {} as any,
     });
 
     expect(fileSystemMock.readDirectory).toHaveBeenCalledWith("/project");
