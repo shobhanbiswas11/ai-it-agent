@@ -5,18 +5,17 @@ import {
   AnomalyDetectionResponse,
   ILogAnomalyDetector,
 } from "../ports/log-anomaly-detector.port";
+import { OpenAIClientFactory } from "./openai-client.factory";
 
 @injectable()
 export class GptLogAnomalyDetector implements ILogAnomalyDetector {
   private client: OpenAI;
-  private model: string = "gpt-4o-mini";
+  private model: string;
 
-  constructor() {
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) {
-      throw new Error("OPENAI_API_KEY environment variable is required");
-    }
-    this.client = new OpenAI({ apiKey });
+  constructor(private clientFactory: OpenAIClientFactory) {
+    const config = this.clientFactory.createClient();
+    this.client = config.client;
+    this.model = config.model;
   }
 
   async detectAnomalies(

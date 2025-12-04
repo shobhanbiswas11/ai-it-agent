@@ -1,12 +1,16 @@
 import { DependencyContainer } from "tsyringe";
 import { GptLogAnomalyDetector } from "./infra/gpt-log-anomaly-detector.adapter";
 import { LogSourceFactory } from "./infra/log-source.factory";
+import { OpenAIClientFactory } from "./infra/openai-client.factory";
 import { ILogAnomalyDetector } from "./ports/log-anomaly-detector.port";
 import { ILogSourceFactory } from "./ports/log-source.factory.port";
 import { CheckLogSourceConnection } from "./use-cases/check-log-source-connection.usecase";
 import { TestLogAnomalyDetection } from "./use-cases/test-log-anomaly-detection.usecase";
 
 export function registerLogAnalysisModule(container: DependencyContainer) {
+  // Register factories
+  container.registerSingleton(OpenAIClientFactory);
+
   // Register implementations for interfaces
   container.registerSingleton<ILogSourceFactory>(
     "ILogSourceFactory",
