@@ -1,6 +1,6 @@
 import z, { ZodType } from "zod";
 
-interface Tool<T extends ZodType = ZodType> {
+export interface Tool<T extends ZodType = ZodType> {
   name: string;
   description: string;
   props?: T;
@@ -8,16 +8,18 @@ interface Tool<T extends ZodType = ZodType> {
 }
 
 export interface Agent {
-  run(): Promise<string>;
+  run(query: string): Promise<string>;
+}
+
+export interface AgentBuilderProps {
+  name: string;
+  description: string;
+  systemPrompt: string;
+  tools: Tool[];
 }
 
 export interface AgentBuilderPort {
-  createAgent(props: {
-    name: string;
-    description: string;
-    systemPrompt: string;
-    tools: Tool[];
-  }): Agent;
+  createAgent(props: AgentBuilderProps): Agent;
 }
 
 export const AgentBuilderPortKey = Symbol("AgentBuilderPort");

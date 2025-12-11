@@ -5,31 +5,26 @@ import {
   TicketRepoPortKey,
 } from "../ports/ticket.repo";
 
-import { openai } from "@llamaindex/openai";
-import { agent } from "@llamaindex/workflow";
-import { tool } from "llamaindex";
 import { z } from "zod";
 import {
-  Agent,
   AgentBuilderPort,
   AgentBuilderPortKey,
+  Tool,
 } from "../ports/agent-builder.port";
 
 @injectable()
 export class AgenticKbService {
-  private _agent: Agent;
-
   constructor(
     @inject(TicketRepoPortKey) private _ticketRepo: TicketRepoPort,
     @inject(AgentBuilderPortKey) private _agentBuilder: AgentBuilderPort
   ) {}
 
-  private initSemanticSearchTool() {
-    return tool({
+  private initSemanticSearchTool(): Tool {
+    return {
       name: "semanticSearchTool",
       description:
         "Search tickets in the knowledge base using semantic search. Use this when you need to find tickets based on meaning or similarity.",
-      parameters: z.object({
+      props: z.object({
         text: z.string().describe("The search query text"),
         topK: z
           .number()
@@ -39,7 +34,7 @@ export class AgenticKbService {
           "Optional filters for status, priority, kbId, etc."
         ),
       }),
-      execute: async ({ text, topK, filter }) => {
+      executer: async ({ text, topK, filter }) => {
         const results = await this._ticketRepo.semanticQuery({
           text,
           topK,
@@ -62,18 +57,18 @@ export class AgenticKbService {
           2
         );
       },
-    });
+    };
   }
 
-  private initQuantitativeSearchTool() {
-    return tool({
+  private initQuantitativeSearchTool(): Tool {
+    return {
       name: "quantitativeSearchTool",
       description:
         "Search tickets using exact filters like status, priority, kbId, or date ranges. Use this when you need to find tickets matching specific criteria.",
-      parameters: z.object({
+      props: z.object({
         filter: QueryFilterSchema.describe("Filter criteria to search tickets"),
       }),
-      execute: async ({ filter }) => {
+      executer: async ({ filter }) => {
         const results = await this._ticketRepo.query(filter);
 
         return JSON.stringify(
@@ -92,25 +87,15 @@ export class AgenticKbService {
           2
         );
       },
-    });
+    };
   }
 
   async query(kbIds: string[], query: string) {
-    // Initialize tools
-    const semanticTool = this.initSemanticSearchTool();
-    const quantitativeTool = this.initQuantitativeSearchTool();
-
-    // Create OpenAI LLM
-    const llm = openai({
-      model: "gpt-4o",
-      temperature: 0,
-    });
-
-    // Create agent with tools
-    const agentInstance = agent({
+    const agent = this._agentBuilder.createAgent({
       name: "TicketingKBAgent",
-      llm,
-      tools: [semanticTool, quantitativeTool],
+      description:
+        "An agent that helps users search through IT support tickets in a knowledge base.",
+
       systemPrompt: `You are a helpful assistant that helps users search through IT support tickets in a knowledge base.
 You have access to two tools:
 1. semanticSearchTool - for finding tickets based on meaning and similarity
@@ -120,10 +105,11 @@ The user is querying knowledge bases with IDs: ${kbIds.join(", ")}
 When searching, make sure to filter by kbId if needed.
 
 Always provide clear, helpful responses based on the ticket data you find.`,
+      tools: [this.initSemanticSearchTool(), this.initQuantitativeSearchTool()],
     });
 
     // Run the agent with the user query
-    const response = await agentInstance.run(query);
-    return response.data.result;
+    const response = await agent.run(query);
+    return response;
   }
 }
