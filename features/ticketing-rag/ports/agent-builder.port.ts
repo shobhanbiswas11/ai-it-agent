@@ -1,6 +1,6 @@
 import z, { ZodType } from "zod";
 
-interface Tool<T extends ZodType = ZodType> {
+export interface Tool<T extends ZodType = ZodType> {
   name: string;
   description: string;
   props?: T;
@@ -8,7 +8,7 @@ interface Tool<T extends ZodType = ZodType> {
 }
 
 export interface Agent {
-  run(): Promise<string>;
+  run(query: string): Promise<string>;
 }
 
 export interface AgentBuilderPort {
