@@ -9,6 +9,6 @@ module.exports = {
   transform: {
     ...tsJestTransformCfg,
   },
-  setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
+  setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
   testPathIgnorePatterns: [".*\\.integration\\.test\\.ts$"],
 };
