@@ -19,7 +19,7 @@ export class AgenticKbService {
     @inject(AgentBuilderPortKey) private _agentBuilder: AgentBuilderPort
   ) {}
 
-  private initSemanticSearchTool(): Tool {
+  private initSemanticSearchTool = (): Tool => {
     return {
       name: "semanticSearchTool",
       description:
@@ -58,9 +58,9 @@ export class AgenticKbService {
         );
       },
     };
-  }
+  };
 
-  private initQuantitativeSearchTool(): Tool {
+  private initQuantitativeSearchTool = (): Tool => {
     return {
       name: "quantitativeSearchTool",
       description:
@@ -88,7 +88,7 @@ export class AgenticKbService {
         );
       },
     };
-  }
+  };
 
   async query(kbIds: string[], query: string) {
     const agent = this._agentBuilder.createAgent({
