@@ -9,10 +9,20 @@ import { openai } from "@llamaindex/openai";
 import { agent } from "@llamaindex/workflow";
 import { tool } from "llamaindex";
 import { z } from "zod";
+import {
+  Agent,
+  AgentBuilderPort,
+  AgentBuilderPortKey,
+} from "../ports/agent-builder.port";
 
 @injectable()
 export class AgenticKbService {
-  constructor(@inject(TicketRepoPortKey) private _ticketRepo: TicketRepoPort) {}
+  private _agent: Agent;
+
+  constructor(
+    @inject(TicketRepoPortKey) private _ticketRepo: TicketRepoPort,
+    @inject(AgentBuilderPortKey) private _agentBuilder: AgentBuilderPort
+  ) {}
 
   private initSemanticSearchTool() {
     return tool({
