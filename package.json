@@ -4,8 +4,8 @@
   "main": "index.js",
   "scripts": {
     "start": "ts-node main.ts",
-    "test": "jest",
-    "test:integration": "jest --config=jest.integration.config.js",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test:integration": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config=jest.integration.config.js",
     "test:watch": "jest --watchAll"
   },
   "keywords": [],
