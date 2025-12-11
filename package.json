@@ -14,6 +14,7 @@
   "description": "",
   "dependencies": {
     "@azure/identity": "^4.13.0",
+    "@chroma-core/openai": "^0.1.8",
     "@llamaindex/huggingface": "^0.1.32",
     "@llamaindex/openai": "^0.4.22",
     "@llamaindex/readers": "^3.1.21",
@@ -27,6 +28,7 @@
     "aws-lambda": "^1.0.7",
     "axios": "^1.13.2",
     "better-sqlite3": "^12.5.0",
+    "chromadb": "^3.1.7",
     "constructs": "^10.4.3",
     "csv-parser": "^3.2.0",
     "express": "^5.2.1",
