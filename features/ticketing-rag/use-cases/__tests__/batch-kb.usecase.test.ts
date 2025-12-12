@@ -1,3 +1,4 @@
+import { Mocked } from "vitest";
 import { KbBatchEvent } from "../../domain/events/kb-batch.event";
 import { EventBusPort } from "../../ports/event-bus.port";
 import { KbBatchService } from "../../services/kb-batch.service";
@@ -5,16 +6,16 @@ import { BatchKnowledgeBase } from "../batch-kb.usecase";
 
 describe("ProcessKnowledgeBase", () => {
   let useCase: BatchKnowledgeBase;
-  let mockKbBatchService: jest.Mocked<KbBatchService>;
-  let mockEventBus: jest.Mocked<EventBusPort>;
+  let mockKbBatchService: Mocked<KbBatchService>;
+  let mockEventBus: Mocked<EventBusPort>;
 
   beforeEach(() => {
     mockKbBatchService = {
-      createBatch: jest.fn(),
+      createBatch: vi.fn(),
     } as any;
 
     mockEventBus = {
-      publish: jest.fn(),
+      publish: vi.fn(),
     } as any;
 
     useCase = new BatchKnowledgeBase(mockKbBatchService, mockEventBus);

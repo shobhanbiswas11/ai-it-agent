@@ -3,21 +3,21 @@ import { LanguageLibraryCleaner } from "../language-library-cleaner.tool";
 
 describe("Language Library Cleaner", () => {
   let languageLibraryCleaner: LanguageLibraryCleaner;
-  let fileSystemMock: jest.Mocked<IFileSystem>;
+  let fileSystemMock: Mocked<IFileSystem>;
 
   beforeEach(() => {
     fileSystemMock = {
-      isDirectory: jest.fn(),
-      readDirectory: jest.fn(),
-      removeDirectory: jest.fn(),
+      isDirectory: vi.fn(),
+      readDirectory: vi.fn(),
+      removeDirectory: vi.fn(),
     };
 
     languageLibraryCleaner = new LanguageLibraryCleaner(
       {
-        getFileSystem: jest.fn().mockReturnValue(fileSystemMock),
+        getFileSystem: vi.fn().mockReturnValue(fileSystemMock),
       },
       {
-        log: jest.fn(),
+        log: vi.fn(),
       }
     );
   });

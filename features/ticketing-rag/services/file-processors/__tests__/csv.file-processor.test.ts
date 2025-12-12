@@ -6,7 +6,7 @@ describe("CSV file processor", () => {
     const dummyCsv = "name,age\nAlice,30\nBob,25\nCharlie,35";
     const stream = Readable.from(Buffer.from(dummyCsv));
 
-    const fn = jest.fn();
+    const fn = vi.fn();
 
     const processor = new CSVProcessor();
     await processor.process(stream, fn);

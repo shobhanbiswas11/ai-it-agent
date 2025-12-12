@@ -7,11 +7,11 @@ describe("query knowledge bases", () => {
   // Whatever answer is the agent is giving back, we'll send that back to the user
 
   let queryKnowledgeBase: QueryKnowledgeBase;
-  let agenticKbService: jest.Mocked<AgenticKbService>;
+  let agenticKbService: Mocked<AgenticKbService>;
 
   beforeEach(() => {
     agenticKbService = {
-      query: jest.fn(),
+      query: vi.fn(),
     } as any;
 
     queryKnowledgeBase = new QueryKnowledgeBase(agenticKbService);

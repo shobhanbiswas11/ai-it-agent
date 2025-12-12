@@ -23,7 +23,7 @@ describe("Zip file processor integration test", () => {
 
     const processor = new ZipProcessor();
 
-    const fn = jest.fn();
+    const fn = vi.fn();
     await processor.process(stream, fn);
 
     expect(fn).toHaveBeenCalledTimes(6);

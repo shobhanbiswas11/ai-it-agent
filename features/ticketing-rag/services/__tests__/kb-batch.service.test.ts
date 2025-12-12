@@ -9,39 +9,39 @@ import { KbFileService } from "../kb-file.service";
 
 describe("KbBatchService", () => {
   let service: KbBatchService;
-  let mockKbFileService: jest.Mocked<KbFileService>;
-  let mockFileSystemPort: jest.Mocked<FileSystemPort>;
-  let mockFileProcessorFactory: jest.Mocked<FileProcessorFactory>;
-  let mockFileProcessor: jest.Mocked<FileProcessor>;
-  let mockTicketRepo: jest.Mocked<TicketRepoPort>;
-  let mockKbRepo: jest.Mocked<KbRepoPort>;
+  let mockKbFileService: Mocked<KbFileService>;
+  let mockFileSystemPort: Mocked<FileSystemPort>;
+  let mockFileProcessorFactory: Mocked<FileProcessorFactory>;
+  let mockFileProcessor: Mocked<FileProcessor>;
+  let mockTicketRepo: Mocked<TicketRepoPort>;
+  let mockKbRepo: Mocked<KbRepoPort>;
 
   beforeEach(() => {
     // Create mocks
     mockKbFileService = {
-      listUploads: jest.fn(),
+      listUploads: vi.fn(),
     } as any;
 
     mockFileSystemPort = {
-      readAsStream: jest.fn(),
-      writeFromStream: jest.fn(),
-      list: jest.fn(),
+      readAsStream: vi.fn(),
+      writeFromStream: vi.fn(),
+      list: vi.fn(),
     };
 
     mockFileProcessor = {
-      process: jest.fn(),
+      process: vi.fn(),
     } as any;
 
     mockFileProcessorFactory = {
-      getFileProcessor: jest.fn().mockResolvedValue(mockFileProcessor),
+      getFileProcessor: vi.fn().mockResolvedValue(mockFileProcessor),
     } as any;
 
     mockTicketRepo = {
-      batchWrite: jest.fn().mockResolvedValue(undefined),
+      batchWrite: vi.fn().mockResolvedValue(undefined),
     } as any;
 
     mockKbRepo = {
-      findById: jest.fn().mockResolvedValue({
+      findById: vi.fn().mockResolvedValue({
         id: "kb-123",
         fieldMap: { title: "title" },
       }),

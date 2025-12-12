@@ -5,21 +5,21 @@ import { KbFileService } from "../../services/kb-file.service";
 import { UploadKnowledgeBase } from "../upload-kb.usecase";
 
 describe("upload knowledge-base usecase", () => {
-  let kbFileService: jest.Mocked<KbFileService>;
-  let kbRepo: jest.Mocked<KbRepoPort>;
-  let eventBus: jest.Mocked<EventBusPort>;
+  let kbFileService: Mocked<KbFileService>;
+  let kbRepo: Mocked<KbRepoPort>;
+  let eventBus: Mocked<EventBusPort>;
 
   beforeEach(() => {
     kbFileService = {
-      upload: jest.fn(),
-    } as unknown as jest.Mocked<KbFileService>;
+      upload: vi.fn(),
+    } as unknown as Mocked<KbFileService>;
 
     kbRepo = {
-      save: jest.fn(),
-    } as unknown as jest.Mocked<KbRepoPort>;
+      save: vi.fn(),
+    } as unknown as Mocked<KbRepoPort>;
 
     eventBus = {
-      publish: jest.fn(),
+      publish: vi.fn(),
     };
   });
 

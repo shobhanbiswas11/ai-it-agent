@@ -4,22 +4,22 @@ import { AgenticKbService } from "../agentic-kb.service";
 
 describe("AgenticKbService", () => {
   let service: AgenticKbService;
-  let mockTicketRepo: jest.Mocked<TicketRepoPort>;
-  let mockAgentBuilder: jest.Mocked<AgentBuilderPort>;
+  let mockTicketRepo: Mocked<TicketRepoPort>;
+  let mockAgentBuilder: Mocked<AgentBuilderPort>;
   let mockAgent: { run: jest.Mock };
 
   beforeEach(() => {
     mockTicketRepo = {
-      semanticQuery: jest.fn(),
-      query: jest.fn(),
+      semanticQuery: vi.fn(),
+      query: vi.fn(),
     } as any;
 
     mockAgent = {
-      run: jest.fn(),
+      run: vi.fn(),
     };
 
     mockAgentBuilder = {
-      createAgent: jest.fn().mockReturnValue(mockAgent),
+      createAgent: vi.fn().mockReturnValue(mockAgent),
     } as any;
 
     service = new AgenticKbService(mockTicketRepo, mockAgentBuilder);

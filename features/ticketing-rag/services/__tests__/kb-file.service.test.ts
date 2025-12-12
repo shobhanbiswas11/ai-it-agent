@@ -4,13 +4,13 @@ import { KbFileService } from "../kb-file.service";
 
 describe("KbFileService", () => {
   let service: KbFileService;
-  let mockFileSystem: jest.Mocked<FileSystemPort>;
+  let mockFileSystem: Mocked<FileSystemPort>;
 
   beforeEach(() => {
     mockFileSystem = {
-      writeFromStream: jest.fn(),
-      list: jest.fn(),
-      readAsStream: jest.fn(),
+      writeFromStream: vi.fn(),
+      list: vi.fn(),
+      readAsStream: vi.fn(),
     };
 
     service = new KbFileService(mockFileSystem);

@@ -13,15 +13,15 @@ describe("test log anomaly detection", () => {
       ],
     };
 
-    const logSource: jest.Mocked<ILogSource> = {
+    const logSource: Mocked<ILogSource> = {
       fetchLogs: jest
         .fn()
         .mockResolvedValue({ logs: mockLogs, count: mockLogs.length }),
-      testConnection: jest.fn(),
+      testConnection: vi.fn(),
     };
 
-    const anomalyDetector: jest.Mocked<ILogAnomalyDetector> = {
-      detectAnomalies: jest.fn().mockResolvedValue(mockAnomalies),
+    const anomalyDetector: Mocked<ILogAnomalyDetector> = {
+      detectAnomalies: vi.fn().mockResolvedValue(mockAnomalies),
     };
 
     const testLogAnomalyDetection = new TestLogAnomalyDetection(

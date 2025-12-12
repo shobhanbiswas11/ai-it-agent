@@ -3,17 +3,17 @@ import { ILogAnomalyDetector } from "../../ports/log-anomaly-detector.port";
 import { DetectAnomalousLogs } from "../detect-anomalous-logs.usecase";
 
 describe("anomalous logs detection", () => {
-  let anomalyDetector: jest.Mocked<ILogAnomalyDetector>;
+  let anomalyDetector: Mocked<ILogAnomalyDetector>;
   beforeEach(() => {
     anomalyDetector = {
-      detectAnomalies: jest.fn(),
-    } as jest.Mocked<ILogAnomalyDetector>;
+      detectAnomalies: vi.fn(),
+    } as Mocked<ILogAnomalyDetector>;
   });
 
   it("should detect anomalous logs and mark them", async () => {
     const logs = Array.from({ length: 3 }, (_, i) => {
       const log = new Log(`log${i + 1}`);
-      log.markAnomalous = jest.fn();
+      log.markAnomalous = vi.fn();
       return log;
     });
 
