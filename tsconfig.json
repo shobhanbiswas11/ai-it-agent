@@ -19,7 +19,8 @@
     "emitDecoratorMetadata": true,
     "strictPropertyInitialization": false,
     "esModuleInterop": true,
-    "typeRoots": ["./node_modules/@types"]
+    "types": ["vitest/globals"]
   },
-  "exclude": ["node_modules", "cdk.out"]
+  "exclude": ["node_modules", "cdk.out"],
+  "include": ["**/*.ts", "vitest.d.ts"]
 }
