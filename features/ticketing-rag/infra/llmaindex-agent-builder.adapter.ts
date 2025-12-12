@@ -4,11 +4,17 @@ import {
   AgentBuilderProps,
 } from "../ports/agent-builder.port";
 
-import { openai } from "@llamaindex/openai";
 import { agent } from "@llamaindex/workflow";
-import { tool } from "llamaindex";
+import { Settings, tool } from "llamaindex";
+import { singleton } from "tsyringe";
+import { LLmaLLMFactory } from "./llma-llm.factory";
 
+@singleton()
 export class LlmaindexAgentBuilderAdapter implements AgentBuilderPort {
+  constructor(private llmFactory: LLmaLLMFactory) {
+    Settings.llm = this.llmFactory.getLLM();
+  }
+
   createAgent({
     name,
     description,
@@ -27,7 +33,6 @@ export class LlmaindexAgentBuilderAdapter implements AgentBuilderPort {
           execute: toolConfig.executer,
         })
       ),
-      llm: openai({ model: "gpt-4o-mini" }),
     });
 
     return {
