@@ -1,10 +1,7 @@
-import { inject, injectable } from "tsyringe";
+import { injectable } from "tsyringe";
 import z from "zod";
 import { fileSystemSchema } from "../dtos/file-system.dto";
-import {
-  IFileSystemFactory,
-  IFileSystemFactoryToken,
-} from "../ports/file-system.factory.port";
+import { FileSystemFactory } from "../factories/file-system.factory";
 import { LoggingService } from "../services/logging.service";
 import { Tool } from "./tool";
 
@@ -33,8 +30,7 @@ export class LanguageLibraryCleaner extends Tool {
   });
 
   constructor(
-    @inject(IFileSystemFactoryToken)
-    private _fileSystemFactory: IFileSystemFactory,
+    private _fileSystemFactory: FileSystemFactory,
     private _logger: LoggingService
   ) {
     super();

@@ -1,9 +1,9 @@
-import { IFileSystem } from "../../ports/file-system.port";
+import { FileSystemPort } from "../../ports/file-system.port";
 import { LanguageLibraryCleaner } from "../language-library-cleaner.tool";
 
 describe("Language Library Cleaner", () => {
   let languageLibraryCleaner: LanguageLibraryCleaner;
-  let fileSystemMock: Mocked<IFileSystem>;
+  let fileSystemMock: Mocked<FileSystemPort>;
 
   beforeEach(() => {
     fileSystemMock = {
@@ -15,7 +15,7 @@ describe("Language Library Cleaner", () => {
     languageLibraryCleaner = new LanguageLibraryCleaner(
       {
         getFileSystem: vi.fn().mockReturnValue(fileSystemMock),
-      },
+      } as any,
       {
         log: vi.fn(),
       }

@@ -1,7 +1,9 @@
 import * as fs from "fs/promises";
-import { IFileSystem } from "../ports/file-system.port";
+import { singleton } from "tsyringe";
+import { FileSystemPort } from "../ports/file-system.port";
 
-export class LocalFileSystem implements IFileSystem {
+@singleton()
+export class LocalFileSystemAdapter implements FileSystemPort {
   async readDirectory(dirPath: string): Promise<string[]> {
     try {
       const entries = await fs.readdir(dirPath);
