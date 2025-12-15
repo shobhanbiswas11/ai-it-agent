@@ -44,6 +44,10 @@ export class Ticket {
     return this._init.metadata;
   }
 
+  get text() {
+    return `${this.title}\n${this.description ?? ""}`.trim();
+  }
+
   static create(props: Create): Ticket {
     return new Ticket({
       id: crypto.randomUUID(),
