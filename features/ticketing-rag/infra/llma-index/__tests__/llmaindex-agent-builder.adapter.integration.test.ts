@@ -1,10 +1,9 @@
 import z from "zod";
-import { LLmaLLMFactory } from "../llma-llm.factory";
 import { LlmaindexAgentBuilderAdapter } from "../llmaindex-agent-builder.adapter";
 
 describe("Llamaindex agent builder", () => {
   it("exec", async () => {
-    const agentBuilder = new LlmaindexAgentBuilderAdapter(new LLmaLLMFactory());
+    const agentBuilder = new LlmaindexAgentBuilderAdapter();
     const agent = agentBuilder.createAgent({
       name: "Test Agent",
       description: "Test Description",
