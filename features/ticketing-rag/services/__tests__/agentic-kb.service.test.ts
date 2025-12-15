@@ -1,17 +1,24 @@
 import { AgentBuilderPort } from "../../ports/agent-builder.port";
-import { TicketRepoPort } from "../../ports/ticket.repo";
+import {
+  TicketRepoPort,
+  TicketSemanticRepoPort,
+} from "../../ports/ticket.repo";
 import { AgenticKbService } from "../agentic-kb.service";
 
 describe("AgenticKbService", () => {
   let service: AgenticKbService;
   let mockTicketRepo: Mocked<TicketRepoPort>;
   let mockAgentBuilder: Mocked<AgentBuilderPort>;
-  let mockAgent: { run: jest.Mock };
+  let mockTicketSemanticRepo: Mocked<TicketSemanticRepoPort>;
+  let mockAgent: { run: MockedFn<any> };
 
   beforeEach(() => {
     mockTicketRepo = {
-      semanticQuery: vi.fn(),
       query: vi.fn(),
+    } as any;
+
+    mockTicketSemanticRepo = {
+      semanticQuery: vi.fn(),
     } as any;
 
     mockAgent = {
@@ -22,7 +29,11 @@ describe("AgenticKbService", () => {
       createAgent: vi.fn().mockReturnValue(mockAgent),
     } as any;
 
-    service = new AgenticKbService(mockTicketRepo, mockAgentBuilder);
+    service = new AgenticKbService(
+      mockTicketRepo,
+      mockAgentBuilder,
+      mockTicketSemanticRepo
+    );
   });
 
   describe("query", () => {

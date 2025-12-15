@@ -3,6 +3,8 @@ import {
   QueryFilterSchema,
   TicketRepoPort,
   TicketRepoPortKey,
+  TicketSemanticRepoPort,
+  TicketSemanticRepoPortKey,
 } from "../ports/ticket.repo";
 
 import { z } from "zod";
@@ -16,7 +18,9 @@ import {
 export class AgenticKbService {
   constructor(
     @inject(TicketRepoPortKey) private _ticketRepo: TicketRepoPort,
-    @inject(AgentBuilderPortKey) private _agentBuilder: AgentBuilderPort
+    @inject(AgentBuilderPortKey) private _agentBuilder: AgentBuilderPort,
+    @inject(TicketSemanticRepoPortKey)
+    private _ticketSemanticRepo: TicketSemanticRepoPort
   ) {}
 
   private initSemanticSearchTool = (): Tool => {
@@ -35,7 +39,7 @@ export class AgenticKbService {
         ),
       }),
       executer: async ({ text, topK, filter }) => {
-        const results = await this._ticketRepo.semanticQuery({
+        const results = await this._ticketSemanticRepo.semanticQuery({
           text,
           topK,
           filter,

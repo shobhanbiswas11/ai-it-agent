@@ -14,11 +14,17 @@ export type QueryFilter = z.infer<typeof QueryFilterSchema>;
 export interface TicketRepoPort {
   batchWrite(tickets: Ticket[]): Promise<void>;
   query(filter: QueryFilter): Promise<Ticket[]>;
-  semanticQuery(props: {
-    text: string;
-    topK?: number;
-    filter?: QueryFilter;
-  }): Promise<Ticket[]>;
+}
+
+export interface SemanticQueryProps {
+  text: string;
+  topK?: number;
+  filter?: QueryFilter;
+}
+export interface TicketSemanticRepoPort {
+  batchWrite(tickets: Ticket[]): Promise<void>;
+  semanticQuery(props: SemanticQueryProps): Promise<Ticket[]>;
 }
 
 export const TicketRepoPortKey = Symbol("TicketRepoPort");
+export const TicketSemanticRepoPortKey = Symbol("TicketSemanticRepoPort");
