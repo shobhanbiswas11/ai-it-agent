@@ -1,14 +1,14 @@
 import OpenAI from "openai";
-import { injectable } from "tsyringe";
+import { singleton } from "tsyringe";
 import {
   AnomalyDetectionPayload,
   AnomalyDetectionResponse,
-  ILogAnomalyDetector,
+  LogAnomalyDetectorPort,
 } from "../ports/log-anomaly-detector.port";
 import { OpenAIClientFactory } from "./openai-client.factory";
 
-@injectable()
-export class GptLogAnomalyDetector implements ILogAnomalyDetector {
+@singleton()
+export class GptLogAnomalyDetectorAdapter implements LogAnomalyDetectorPort {
   private client: OpenAI;
   private model: string;
 

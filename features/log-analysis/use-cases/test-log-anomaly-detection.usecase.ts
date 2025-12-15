@@ -1,24 +1,26 @@
-import { inject, injectable } from "tsyringe";
+import { singleton } from "tsyringe";
 import { LogAnomalyTestReportDTO } from "../dtos/log-anomaly-report.dto";
 import { LogSourceConfig } from "../dtos/log-source.dto";
-import { ILogAnomalyDetector } from "../ports/log-anomaly-detector.port";
-import { ILogSourceFactory } from "../ports/log-source.factory.port";
+import { LogAnomalyDetectorFactory } from "../factories/log-anomaly-detector.factory";
+import { LogSourceFactory } from "../factories/log-source.factory";
 
-@injectable()
+@singleton()
 export class TestLogAnomalyDetection {
   constructor(
-    @inject("ILogSourceFactory") private logSourceFactory: ILogSourceFactory,
-    @inject("ILogAnomalyDetector") private anomalyDetector: ILogAnomalyDetector
+    private _logSourceFactory: LogSourceFactory,
+    private _anomalyDetectorFactory: LogAnomalyDetectorFactory
   ) {}
 
   async execute(config: LogSourceConfig) {
     try {
-      const { logs: rawLogs } = await this.logSourceFactory
+      const { logs: rawLogs } = await this._logSourceFactory
         .getLogSource(config)
         .fetchLogs();
-      const anomalies = await this.anomalyDetector.detectAnomalies({
-        logs: rawLogs.slice(0, 50),
-      });
+      const anomalies = await this._anomalyDetectorFactory
+        .getLogAnomalyDetector()
+        .detectAnomalies({
+          logs: rawLogs.slice(0, 50),
+        });
 
       const successReport: LogAnomalyTestReportDTO = {
         status: "success",

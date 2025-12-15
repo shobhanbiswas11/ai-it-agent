@@ -11,8 +11,12 @@ export interface AnomalyDetectionResponse {
   }[];
 }
 
-export interface ILogAnomalyDetector {
+export interface LogAnomalyDetectorPort {
   detectAnomalies(
     payload: AnomalyDetectionPayload
   ): Promise<AnomalyDetectionResponse>;
 }
+
+export const LogAnomalyDetectorPortKeys = {
+  gpt: Symbol("GptLogAnomalyDetector"),
+};
