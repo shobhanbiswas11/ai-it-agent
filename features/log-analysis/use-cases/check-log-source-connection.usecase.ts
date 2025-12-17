@@ -1,14 +1,12 @@
-import { inject, injectable } from "tsyringe";
+import { singleton } from "tsyringe";
 import { LogSourceConfig } from "../dtos/log-source.dto";
-import { ILogSourceFactory } from "../ports/log-source.factory.port";
+import { LogSourceFactory } from "../factories/log-source.factory";
 
-@injectable()
+@singleton()
 export class CheckLogSourceConnection {
-  constructor(
-    @inject("ILogSourceFactory") private logSourceFactory: ILogSourceFactory
-  ) {}
+  constructor(private _logSourceFactory: LogSourceFactory) {}
   execute(config: LogSourceConfig) {
-    const logSource = this.logSourceFactory.getLogSource(config);
+    const logSource = this._logSourceFactory.create(config);
     return logSource.testConnection();
   }
 }

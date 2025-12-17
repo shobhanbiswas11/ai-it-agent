@@ -1,13 +1,12 @@
 import { Log } from "../../domain/log.entity";
-import { ILogAnomalyDetector } from "../../ports/log-anomaly-detector.port";
+import { LogAnomalyDetectorPort } from "../../ports/log-anomaly-detector.port";
 import { DetectAnomalousLogs } from "../detect-anomalous-logs.usecase";
 
 describe("anomalous logs detection", () => {
-  let anomalyDetector: Mocked<ILogAnomalyDetector>;
+  let mockedAnomalyDetector: Mocked<LogAnomalyDetectorPort>;
+
   beforeEach(() => {
-    anomalyDetector = {
-      detectAnomalies: vi.fn(),
-    } as Mocked<ILogAnomalyDetector>;
+    mockedAnomalyDetector = mock();
   });
 
   it("should detect anomalous logs and mark them", async () => {
@@ -17,7 +16,7 @@ describe("anomalous logs detection", () => {
       return log;
     });
 
-    anomalyDetector.detectAnomalies.mockResolvedValue({
+    mockedAnomalyDetector.detectAnomalies.mockResolvedValue({
       anomalousLogs: [
         {
           log: "log2",
@@ -28,10 +27,12 @@ describe("anomalous logs detection", () => {
       ],
     });
 
-    const detectAnomalousLogs = new DetectAnomalousLogs(anomalyDetector);
+    const detectAnomalousLogs = new DetectAnomalousLogs({
+      create: () => mockedAnomalyDetector,
+    } as any);
     const result = await detectAnomalousLogs.execute(logs);
 
-    expect(anomalyDetector.detectAnomalies).toHaveBeenCalledWith({
+    expect(mockedAnomalyDetector.detectAnomalies).toHaveBeenCalledWith({
       logs: ["log1", "log2", "log3"],
     });
 

@@ -1,12 +1,10 @@
-import { GptLogAnomalyDetector } from "../../../infra/gpt-log-anomaly-detector.adapter";
-import { LogSourceFactory } from "../../../infra/log-source.factory";
-import { ILogAnomalyDetector } from "../../../ports/log-anomaly-detector.port";
-import { ILogSourceFactory } from "../../../ports/log-source.factory.port";
+import { LogSourceFactory } from "../../../factories/log-source.factory";
+import { ZabbixLogSource } from "../../../infra/zabbix-log-source.adapter";
 import { TestLogAnomalyDetection } from "../../test-log-anomaly-detection.usecase";
 
 describe("Test log anomaly detection", () => {
   test("should fetch logs and run anomaly detection", async () => {
-    const logSource = new LogSourceFactory().getLogSource({
+    const logSource = new LogSourceFactory(new ZabbixLogSource({})).create({
       type: "zabbix",
       config: {
         host: process.env.ZABBIX_HOST || "",

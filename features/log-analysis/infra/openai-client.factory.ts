@@ -1,13 +1,13 @@
 import { ClientSecretCredential } from "@azure/identity";
 import OpenAI from "openai";
-import { injectable } from "tsyringe";
+import { singleton } from "tsyringe";
 
 export interface OpenAIClientConfig {
   client: OpenAI;
   model: string;
 }
 
-@injectable()
+@singleton()
 export class OpenAIClientFactory {
   createClient(): OpenAIClientConfig {
     const authType = process.env.OPENAI_AUTH_TYPE || "openai";

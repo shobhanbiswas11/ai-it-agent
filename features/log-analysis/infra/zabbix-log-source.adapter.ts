@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from "axios";
-import { ILogSource } from "../ports/log-source.port";
+import { LogSourcePort } from "../ports/log-source.port";
 
-export class ZabbixLogSource implements ILogSource {
+export class ZabbixLogSource implements LogSourcePort {
   private client: AxiosInstance;
   private authToken?: string;
 

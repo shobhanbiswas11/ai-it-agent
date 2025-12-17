@@ -1,9 +1,8 @@
-import type { Mock, MockedFunction, MockedObject } from "vitest";
+import { MockProxy, mock as vitestExtendedMock } from "vitest-mock-extended";
 
 declare global {
-  type Mocked<T> = MockedObject<T>;
-  type MockedFn<T extends (...args: any[]) => any> = MockedFunction<T>;
-  type MockFn = Mock;
+  type Mocked<T> = MockProxy<T>;
+  const mock: typeof vitestExtendedMock;
 }
 
 export {};
